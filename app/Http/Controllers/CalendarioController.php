@@ -42,14 +42,28 @@ class CalendarioController extends Controller
 
             // Set environment variable for ChromeDriver
             putenv('PANTHER_CHROME_DRIVER_BINARY=' . $driverPath);
+            putenv('PANTHER_NO_HEADLESS=0');
 
-            // Create a Panther client (headless Chrome)
+            // Use a random port to avoid conflicts
+            $port = rand(9516, 9999);
+
+            // Create a Panther client (headless Chrome) with more options
             $client = Client::createChromeClient($driverPath, [
-                '--headless',
+                '--headless=new',
                 '--disable-gpu',
                 '--no-sandbox',
                 '--disable-dev-shm-usage',
+                '--disable-software-rasterizer',
+                '--disable-extensions',
+                '--disable-web-security',
                 '--window-size=1920,1080',
+                '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                '--remote-debugging-port=' . rand(9222, 9999),
+                '--disable-blink-features=AutomationControlled',
+            ], [
+                'connection_timeout_in_ms' => 60000,
+                'request_timeout_in_ms' => 60000,
+                'port' => $port,
             ]);
 
             Log::info('Starting calendar scraping...');
