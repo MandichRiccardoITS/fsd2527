@@ -22,34 +22,12 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-12 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Legenda</h5>
-                    <div class="d-flex flex-column gap-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-warning" style="width: 20px; height: 20px;"></span>
-                            <small>Giornata evidenziata in <strong>arancione</strong>: minore/uguale di <strong>8h</strong> di lezione.</small>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-danger" style="width: 20px; height: 20px;"></span>
-                            <small>Giornata evidenziata in <strong>rosso</strong>: minore/uguale di <strong>4h</strong> di lezione.</small>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-success" style="width: 20px; height: 20px;"></span>
-                            <small>Riga in <strong>verde</strong>: <strong>Esame</strong> (penultima lezione del modulo).</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="card">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-dark table-striped table-hover mb-0" id="dataTable">
+                <table class="table table-dark table-rounded table-striped table-hover mb-0" id="dataTable">
                     <thead class="table-dark sticky-top">
                         <tr>
                             <th>Data</th>
