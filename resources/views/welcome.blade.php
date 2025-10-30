@@ -154,7 +154,7 @@
         });
 
         // Copy script to clipboard
-        function copyScriptToClipboard() {
+        async function copyScriptToClipboard() {
             const statusEl = document.getElementById('scrapeStatus');
             const btn = event.target;
 
@@ -264,8 +264,9 @@
 })();
 `.trim();
 
-            // Copy to clipboard
-            navigator.clipboard.writeText(script).then(() => {
+            // Try to copy to clipboard
+            try {
+                await navigator.clipboard.writeText(script);
                 statusEl.innerHTML = '<span class="text-success">✅ Script copiato negli appunti!</span>';
                 btn.innerHTML = '✅ Script Copiato!';
 
@@ -273,9 +274,47 @@
                     btn.innerHTML = '📋 Copia Script di Aggiornamento';
                     statusEl.innerHTML = '';
                 }, 3000);
-            }).catch(err => {
-                statusEl.innerHTML = '<span class="text-danger">❌ Errore nella copia: ' + err.message + '</span>';
-            });
+            } catch (err) {
+                console.error('Clipboard error:', err);
+
+                // Fallback: show script in a modal/prompt
+                const textarea = document.createElement('textarea');
+                textarea.value = script;
+                textarea.style.position = 'fixed';
+                textarea.style.top = '0';
+                textarea.style.left = '0';
+                textarea.style.width = '2em';
+                textarea.style.height = '2em';
+                textarea.style.padding = '0';
+                textarea.style.border = 'none';
+                textarea.style.outline = 'none';
+                textarea.style.boxShadow = 'none';
+                textarea.style.background = 'transparent';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        statusEl.innerHTML = '<span class="text-success">✅ Script copiato negli appunti!</span>';
+                        btn.innerHTML = '✅ Script Copiato!';
+
+                        setTimeout(() => {
+                            btn.innerHTML = '📋 Copia Script di Aggiornamento';
+                            statusEl.innerHTML = '';
+                        }, 3000);
+                    } else {
+                        throw new Error('Copy command failed');
+                    }
+                } catch (err2) {
+                    // Last resort: show in alert
+                    alert('Copia questo script e incollalo nella console del sito esterno:\n\n' + script);
+                    statusEl.innerHTML = '<span class="text-warning">⚠️ Copia manualmente lo script dall\'alert</span>';
+                } finally {
+                    document.body.removeChild(textarea);
+                }
+            }
         }
     </script>
 @endsection
