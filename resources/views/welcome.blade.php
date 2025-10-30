@@ -16,14 +16,24 @@
 
     <div class="alert alert-info">
         <h5>📝 Come aggiornare il calendario:</h5>
-        <ol class="mb-0">
+        <ol class="mb-2">
             <li>Clicca sul pulsante "📋 Copia Script di Aggiornamento" qui sopra</li>
             <li>Vai su <a href="https://its-calendar-2025-2027.netlify.app/?year=1" target="_blank">https://its-calendar-2025-2027.netlify.app/?year=1</a></li>
             <li>Clicca il pulsante per caricare i dati nella tabella</li>
             <li>Apri la console del browser (F12 → Console)</li>
             <li>Incolla lo script copiato e premi Invio</li>
-            <li>I dati verranno automaticamente inviati e importati!</li>
+            <li>I dati verranno copiati negli appunti automaticamente</li>
+            <li>Torna qui e incolla i dati nel campo qui sotto</li>
         </ol>
+
+        <div class="mt-3">
+            <label for="importData" class="form-label fw-bold">📥 Incolla i dati JSON qui:</label>
+            <textarea id="importData" class="form-control mb-2" rows="3" placeholder='Incolla qui i dati copiati dalla console...'></textarea>
+            <button class="btn btn-success" onclick="importData()">
+                ✅ Importa Dati
+            </button>
+            <span id="importStatus" class="ms-3"></span>
+        </div>
     </div>
 
     <div class="row g-3 mb-4">
@@ -153,16 +163,72 @@
             document.getElementById('rowsCount').textContent = visibleCount + ' righe visualizzate';
         });
 
+        // Import data function
+        async function importData() {
+            const importStatus = document.getElementById('importStatus');
+            const importDataField = document.getElementById('importData');
+            const btn = event.target;
+
+            const jsonData = importDataField.value.trim();
+
+            if (!jsonData) {
+                importStatus.innerHTML = '<span class="text-danger">❌ Nessun dato da importare!</span>';
+                return;
+            }
+
+            let lezioni;
+            try {
+                lezioni = JSON.parse(jsonData);
+            } catch (e) {
+                importStatus.innerHTML = '<span class="text-danger">❌ Dati JSON non validi!</span>';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Importazione in corso...';
+            importStatus.innerHTML = '<span class="text-warning">Invio dati al server...</span>';
+
+            try {
+                const response = await fetch('{{ route('calendario.update') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lezioni: lezioni
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    importStatus.innerHTML = '<span class="text-success">✅ Successo! Inseriti: ' + result.data.inserted + ', Aggiornati: ' + result.data.updated + '</span>';
+                    importDataField.value = '';
+
+                    // Reload page after 2 seconds
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    importStatus.innerHTML = '<span class="text-danger">❌ Errore: ' + result.message + '</span>';
+                }
+            } catch (error) {
+                importStatus.innerHTML = '<span class="text-danger">❌ Errore: ' + error.message + '</span>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '✅ Importa Dati';
+            }
+        }
+
         // Copy script to clipboard
         async function copyScriptToClipboard() {
             const statusEl = document.getElementById('scrapeStatus');
             const btn = event.target;
 
             const script = `
-(async function() {
-    const SERVER_URL = '{{ str_replace('http://', 'https://', route('calendario.update')) }}';
-    const CSRF_TOKEN = '{{ csrf_token() }}';
-
+(function() {
     console.log('🔄 Inizio estrazione dati dalla tabella...');
 
     // Get table rows
@@ -231,36 +297,22 @@
         return;
     }
 
-    console.log('📤 Invio dati al server...');
+    console.log('📤 Preparazione invio dati al server...');
+    console.log('📋 Copia i dati qui sotto e incollali nella pagina del tuo sito:');
+    console.log('---START---');
+    console.log(JSON.stringify(lezioni));
+    console.log('---END---');
 
-    try {
-        const response = await fetch(SERVER_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': CSRF_TOKEN,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                lezioni: lezioni
-            })
-        });
+    // Copy to clipboard
+    const jsonData = JSON.stringify(lezioni);
+    const textarea = document.createElement('textarea');
+    textarea.value = jsonData;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
 
-        const result = await response.json();
-
-        if (result.success) {
-            console.log('✅ Successo!');
-            console.log('📊 Inseriti: ' + result.data.inserted);
-            console.log('📊 Aggiornati: ' + result.data.updated);
-            alert('✅ Calendario aggiornato con successo!\\n\\nInseriti: ' + result.data.inserted + '\\nAggiornati: ' + result.data.updated);
-        } else {
-            console.error('❌ Errore:', result.message);
-            alert('❌ Errore: ' + result.message);
-        }
-    } catch (error) {
-        console.error('❌ Errore di connessione:', error);
-        alert('❌ Errore di connessione: ' + error.message);
-    }
+    alert('✅ Dati estratti e copiati negli appunti!\\n\\nTotale lezioni: ' + lezioni.length + '\\n\\nOra torna sul tuo sito e incolla i dati nel campo di importazione.');
 })();
 `.trim();
 
