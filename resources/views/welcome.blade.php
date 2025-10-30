@@ -160,7 +160,7 @@
 
             const script = `
 (async function() {
-    const SERVER_URL = '{{ route('calendario.update') }}';
+    const SERVER_URL = '{{ str_replace('http://', 'https://', route('calendario.update')) }}';
     const CSRF_TOKEN = '{{ csrf_token() }}';
 
     console.log('🔄 Inizio estrazione dati dalla tabella...');
