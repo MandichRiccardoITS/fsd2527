@@ -5,8 +5,16 @@ namespace App\Models {
     /**
      * App\Models\Docente
      *
+     * @property \Illuminate\Support\Carbon|null $updated_at
+     * @property \Illuminate\Support\Carbon|null $created_at
+     * @property string $nome
+     * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lezione> $lezioni
      * @property-read int|null $lezioni_count
+     * @method static \Illuminate\Database\Eloquent\Builder<Docente>|Docente whereId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Docente>|Docente whereNome($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Docente>|Docente whereCreatedAt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Docente>|Docente whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Docente>|Docente newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Docente>|Docente newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Docente>|Docente query()
@@ -310,9 +318,27 @@ namespace App\Models {
     /**
      * App\Models\Lezione
      *
+     * @property \Illuminate\Support\Carbon|null $updated_at
+     * @property \Illuminate\Support\Carbon|null $created_at
+     * @property string|null $aula
+     * @property int|null $id_modulo
+     * @property int|null $id_docente
+     * @property datetime:H:i $ora_fine
+     * @property datetime:H:i $ora_inizio
+     * @property \Illuminate\Support\Carbon $data
+     * @property int $id
      * @property-read mixed $ore_lezione
      * @property-read \App\Models\Docente $docente
      * @property-read \App\Models\Modulo $modulo
+     * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione whereId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione whereData($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione whereOraInizio($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione whereOraFine($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione whereIdDocente($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione whereIdModulo($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione whereAula($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione whereCreatedAt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Lezione>|Lezione query()
@@ -616,8 +642,18 @@ namespace App\Models {
     /**
      * App\Models\Modulo
      *
+     * @property \Illuminate\Support\Carbon|null $updated_at
+     * @property \Illuminate\Support\Carbon|null $created_at
+     * @property string $unita_formativa
+     * @property string $nome
+     * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lezione> $lezioni
      * @property-read int|null $lezioni_count
+     * @method static \Illuminate\Database\Eloquent\Builder<Modulo>|Modulo whereId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Modulo>|Modulo whereNome($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Modulo>|Modulo whereUnitaFormativa($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Modulo>|Modulo whereCreatedAt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Modulo>|Modulo whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Modulo>|Modulo newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Modulo>|Modulo newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Modulo>|Modulo query()

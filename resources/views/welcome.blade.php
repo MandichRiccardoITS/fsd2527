@@ -151,7 +151,7 @@
             statusEl.innerHTML = '<span class="text-warning">Scaricamento dati...</span>';
 
             try {
-                const response = await fetch('{{ route('calendario.scrape') }}');
+                const response = await fetch('{{ route('calendario.update') }}');
                 const data = await response.json();
 
                 if (data.success) {
