@@ -16,35 +16,14 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Bootstrap 5.3.8 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
     <!-- inclusion -->
     @yield('include')
 
 </head>
 <style>
-    .innerCarta{
-        height: 100%;
-    }
-    
-    .comune{
-        color: #8B4513;
-    }
-
-    .noncomune{
-        color: white;
-    }
-
-    .rara{
-        color: yellow;
-    }
-
-    .leggendaria{
-        color: lightblue;
-    }
-
-    .speciale{
-        color: #a6a594;
-    }
-
     .bg-custom-light{
         background-color: #555555;
     }
@@ -86,6 +65,9 @@
             </div>
         </footer>
     </div>
+
+    <!-- Bootstrap 5.3.8 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
     @yield('script')
 </body>
