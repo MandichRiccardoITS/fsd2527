@@ -8,10 +8,22 @@
     </div>
 
     <div class="mb-4">
-        <button class="btn btn-primary" onclick="scrapeCalendar()">
-            🔄 Aggiorna Calendario da Web
+        <button class="btn btn-primary" onclick="copyScriptToClipboard()">
+            📋 Copia Script di Aggiornamento
         </button>
         <span id="scrapeStatus" class="ms-3"></span>
+    </div>
+
+    <div class="alert alert-info">
+        <h5>📝 Come aggiornare il calendario:</h5>
+        <ol class="mb-0">
+            <li>Clicca sul pulsante "📋 Copia Script di Aggiornamento" qui sopra</li>
+            <li>Vai su <a href="https://its-calendar-2025-2027.netlify.app/?year=1" target="_blank">https://its-calendar-2025-2027.netlify.app/?year=1</a></li>
+            <li>Clicca il pulsante per caricare i dati nella tabella</li>
+            <li>Apri la console del browser (F12 → Console)</li>
+            <li>Incolla lo script copiato e premi Invio</li>
+            <li>I dati verranno automaticamente inviati e importati!</li>
+        </ol>
     </div>
 
     <div class="row g-3 mb-4">
@@ -128,7 +140,7 @@
                 if (row.querySelector('td[colspan]')) {
                     return;
                 }
-                
+
                 const text = row.textContent.toLowerCase();
                 if (text.includes(searchTerm)) {
                     row.style.display = '';
@@ -141,35 +153,129 @@
             document.getElementById('rowsCount').textContent = visibleCount + ' righe visualizzate';
         });
 
-        // Scrape calendar function
-        async function scrapeCalendar() {
+        // Copy script to clipboard
+        function copyScriptToClipboard() {
             const statusEl = document.getElementById('scrapeStatus');
             const btn = event.target;
-            
-            btn.disabled = true;
-            btn.innerHTML = '⏳ Aggiornamento in corso...';
-            statusEl.innerHTML = '<span class="text-warning">Scaricamento dati...</span>';
 
-            try {
-                const response = await fetch('{{ route('calendario.update') }}');
-                const data = await response.json();
+            const script = `
+(async function() {
+    const SERVER_URL = '{{ route('calendario.update') }}';
+    const CSRF_TOKEN = '{{ csrf_token() }}';
 
-                if (data.success) {
-                    statusEl.innerHTML = `<span class="text-success">✓ Aggiornato! Inseriti: ${data.data.inserted}, Aggiornati: ${data.data.updated}</span>`;
-                    
-                    // Reload page after 2 seconds
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
-                } else {
-                    statusEl.innerHTML = `<span class="text-danger">✗ Errore: ${data.message}</span>`;
-                }
-            } catch (error) {
-                statusEl.innerHTML = `<span class="text-danger">✗ Errore di connessione: ${error.message}</span>`;
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '🔄 Aggiorna Calendario da Web';
-            }
+    console.log('🔄 Inizio estrazione dati dalla tabella...');
+
+    // Get table rows
+    const rows = document.querySelectorAll('#dataTable tbody tr');
+
+    if (rows.length === 0) {
+        alert('❌ Nessuna riga trovata nella tabella! Assicurati di aver cliccato il pulsante per caricare i dati.');
+        return;
+    }
+
+    const lezioni = [];
+
+    rows.forEach((row, index) => {
+        const cells = row.querySelectorAll('td');
+
+        if (cells.length < 7) {
+            return; // Skip invalid rows
+        }
+
+        const dataText = cells[0].textContent.trim();
+        const dalleText = cells[1].textContent.trim();
+        const alleText = cells[2].textContent.trim();
+        const docenteText = cells[3].textContent.trim();
+        const moduloText = cells[4].textContent.trim();
+        const ufText = cells[5].textContent.trim();
+        const aulaText = cells[6].textContent.trim();
+
+        if (!dataText || !dalleText || !alleText) {
+            return; // Skip if essential data is missing
+        }
+
+        // Parse date (format: "lun 27/10/25")
+        const dateParts = dataText.split(' ');
+        if (dateParts.length < 2) {
+            return;
+        }
+
+        const dateString = dateParts[1]; // "27/10/25"
+        const dateComponents = dateString.split('/');
+
+        if (dateComponents.length !== 3) {
+            return;
+        }
+
+        const day = dateComponents[0].padStart(2, '0');
+        const month = dateComponents[1].padStart(2, '0');
+        const year = '20' + dateComponents[2]; // Convert 25 to 2025
+
+        const data = year + '-' + month + '-' + day;
+
+        lezioni.push({
+            data: data,
+            ora_inizio: dalleText,
+            ora_fine: alleText,
+            docente: docenteText || null,
+            modulo: moduloText || null,
+            unita_formativa: ufText || null,
+            aula: aulaText || null
+        });
+    });
+
+    console.log('✅ Estratte ' + lezioni.length + ' lezioni');
+
+    if (lezioni.length === 0) {
+        alert('❌ Nessun dato valido trovato!');
+        return;
+    }
+
+    console.log('📤 Invio dati al server...');
+
+    try {
+        const response = await fetch(SERVER_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                lezioni: lezioni
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            console.log('✅ Successo!');
+            console.log('📊 Inseriti: ' + result.data.inserted);
+            console.log('📊 Aggiornati: ' + result.data.updated);
+            alert('✅ Calendario aggiornato con successo!\\n\\nInseriti: ' + result.data.inserted + '\\nAggiornati: ' + result.data.updated);
+        } else {
+            console.error('❌ Errore:', result.message);
+            alert('❌ Errore: ' + result.message);
+        }
+    } catch (error) {
+        console.error('❌ Errore di connessione:', error);
+        alert('❌ Errore di connessione: ' + error.message);
+    }
+})();
+`.trim();
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(script).then(() => {
+                statusEl.innerHTML = '<span class="text-success">✅ Script copiato negli appunti!</span>';
+                btn.innerHTML = '✅ Script Copiato!';
+
+                setTimeout(() => {
+                    btn.innerHTML = '📋 Copia Script di Aggiornamento';
+                    statusEl.innerHTML = '';
+                }, 3000);
+            }).catch(err => {
+                statusEl.innerHTML = '<span class="text-danger">❌ Errore nella copia: ' + err.message + '</span>';
+            });
         }
     </script>
 @endsection
