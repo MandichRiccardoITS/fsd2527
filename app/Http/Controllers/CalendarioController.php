@@ -8,7 +8,6 @@ use App\Models\Modulo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\Panther\Client;
 
 class CalendarioController extends Controller
 {
@@ -23,6 +22,14 @@ class CalendarioController extends Controller
             ->get();
 
         return view('welcome', compact('lezioni'));
+    }
+
+    /**
+     * Show the import page.
+     */
+    public function showImport()
+    {
+        return view('import');
     }
 
     /**
@@ -60,6 +67,7 @@ class CalendarioController extends Controller
             try {
                 $insertedCount = 0;
                 $updatedCount = 0;
+                $errors = [];
 
                 foreach ($lezioniData as $lezioneData) {
                     // Find or create docente
