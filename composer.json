@@ -17,6 +17,7 @@
         "symfony/http-client": "^7.3"
     },
     "require-dev": {
+        "dbrekelmans/bdi": "^1.4",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.24",

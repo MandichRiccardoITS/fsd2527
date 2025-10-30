@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '110bb7f50a1b570cef03d51c2969b6ab044b0acc',
+        'reference' => 'fa3e447a04c6aac2a927b8aa00d7a979724e4525',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -39,6 +39,15 @@
             'replaced' => array(
                 0 => '*',
             ),
+        ),
+        'dbrekelmans/bdi' => array(
+            'pretty_version' => '1.4.0',
+            'version' => '1.4.0.0',
+            'reference' => 'fa2ff9b5ed0508ddf5cd574f9dfa6fea954a9acd',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../dbrekelmans/bdi',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'dflydev/dot-access-data' => array(
             'pretty_version' => 'v3.0.3',
@@ -400,7 +409,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '110bb7f50a1b570cef03d51c2969b6ab044b0acc',
+            'reference' => 'fa3e447a04c6aac2a927b8aa00d7a979724e4525',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
