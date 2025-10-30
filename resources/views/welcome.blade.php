@@ -148,9 +148,10 @@
             ];
         })) !!};
 
-        let currentDate = new Date();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        // Get today's date from server (more reliable than browser)
+        const todayStr = '{{ \Carbon\Carbon::now()->format('Y-m-d') }}';
+        const today = new Date(todayStr + 'T00:00:00');
+        let currentDate = new Date(todayStr + 'T00:00:00');
 
         // Toggle view (table/calendar)
         document.getElementById('toggleView').addEventListener('change', function(e) {
@@ -183,8 +184,6 @@
             const rows = document.querySelectorAll('#dataTable tbody tr');
             let visibleCount = 0;
 
-            const todayStr = today.toISOString().split('T')[0];
-
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
                 const dateStr = row.getAttribute('data-date');
@@ -196,7 +195,7 @@
                     shouldShow = false;
                 }
 
-                // Check if past
+                // Check if past (compare with server date)
                 if (hidePast && dateStr && dateStr < todayStr) {
                     shouldShow = false;
                 }
@@ -269,8 +268,8 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const lessons = lessonsByDate[dateStr] || [];
-                const isPast = new Date(dateStr) < today;
-                const isToday = dateStr === today.toISOString().split('T')[0];
+                const isPast = dateStr < todayStr;
+                const isToday = dateStr === todayStr;
 
                 let dayClass = 'border rounded p-2 bg-dark';
                 if (isToday) {
