@@ -42,8 +42,8 @@ class CalendarioController extends Controller
             // Navigate to the page
             $crawler = $client->request('GET', 'https://its-calendar-2025-2027.netlify.app/?year=1');
 
-            // Wait for the page to load
-            $client->waitFor('#dataTable', 10);
+            // Wait for the button to be present
+            $client->waitFor('button', 10);
 
             // Click the button using the XPath selector
             try {
@@ -60,13 +60,22 @@ class CalendarioController extends Controller
                 // Click the button
                 $button->click();
 
-                // Wait for the table to update after clicking
+                // Wait for the table to load after clicking the button
+                $client->waitFor('#dataTable tbody tr', 15);
+
+                // Give it a bit more time to ensure all rows are loaded
                 sleep(2);
 
             } catch (\Exception $e) {
-                // If button click fails, continue anyway (maybe data is already loaded)
-                Log::warning('Button click failed: ' . $e->getMessage());
+                $client->quit();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error clicking button or loading table: ' . $e->getMessage()
+                ], 500);
             }
+
+            // Refresh the crawler to get the updated page content
+            $crawler = $client->getCrawler();
 
             // Get the table rows
             $table = $crawler->filter('#dataTable tbody tr');
