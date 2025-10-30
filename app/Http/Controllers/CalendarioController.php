@@ -31,19 +31,44 @@ class CalendarioController extends Controller
     public function scrapeAndUpdate()
     {
         try {
+            // Check if ChromeDriver exists
+            $driverPath = base_path('drivers/chromedriver.exe');
+            if (!file_exists($driverPath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'ChromeDriver not found. Please run: vendor/bin/bdi detect drivers'
+                ], 500);
+            }
+
+            // Set environment variable for ChromeDriver
+            putenv('PANTHER_CHROME_DRIVER_BINARY=' . $driverPath);
+
             // Create a Panther client (headless Chrome)
-            $client = Client::createChromeClient(null, [
+            $client = Client::createChromeClient($driverPath, [
                 '--headless',
                 '--disable-gpu',
                 '--no-sandbox',
                 '--disable-dev-shm-usage',
+                '--window-size=1920,1080',
             ]);
+
+            Log::info('Starting calendar scraping...');
 
             // Navigate to the page
             $crawler = $client->request('GET', 'https://its-calendar-2025-2027.netlify.app/?year=1');
+            Log::info('Page loaded');
 
             // Wait for the button to be present
-            $client->waitFor('button', 10);
+            try {
+                $client->waitFor('button', 10);
+                Log::info('Button found');
+            } catch (\Exception $e) {
+                $client->quit();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Button not found after waiting: ' . $e->getMessage()
+                ], 404);
+            }
 
             // Click the button using the XPath selector
             try {
@@ -57,17 +82,21 @@ class CalendarioController extends Controller
                     ], 404);
                 }
 
+                Log::info('Clicking button...');
                 // Click the button
                 $button->click();
 
+                Log::info('Waiting for table to load...');
                 // Wait for the table to load after clicking the button
-                $client->waitFor('#dataTable tbody tr', 15);
+                $client->waitFor('#dataTable tbody tr', 20);
 
                 // Give it a bit more time to ensure all rows are loaded
-                sleep(2);
+                sleep(3);
+                Log::info('Table loaded');
 
             } catch (\Exception $e) {
                 $client->quit();
+                Log::error('Error during button click or table load: ' . $e->getMessage());
                 return response()->json([
                     'success' => false,
                     'message' => 'Error clicking button or loading table: ' . $e->getMessage()
@@ -79,6 +108,7 @@ class CalendarioController extends Controller
 
             // Get the table rows
             $table = $crawler->filter('#dataTable tbody tr');
+            Log::info('Found ' . $table->count() . ' rows in table');
 
             if ($table->count() === 0) {
                 $client->quit();
