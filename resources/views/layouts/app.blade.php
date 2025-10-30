@@ -19,10 +19,6 @@
     <!-- inclusion -->
     @yield('include')
 
-    <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-
-    @livewireStyles
 </head>
 <style>
     .innerCarta{
@@ -71,9 +67,6 @@
 
     </div>
 
-    @vite('resources/js/alpinejs-config.js')
-    @livewireScripts
-    @stack('scripts')
     @yield('script')
 </body>
 @yield('style')
