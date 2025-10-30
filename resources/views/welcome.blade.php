@@ -7,14 +7,17 @@
         <p class="text-muted">Anno 1</p>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-4 d-flex gap-2">
         <a href="{{ route('calendario.import') }}" class="btn btn-primary">
             🔄 Aggiorna Calendario
+        </a>
+        <a href="{{ route('calendario.export.ics') }}" class="btn btn-success">
+            📥 Scarica Calendario (.ics)
         </a>
     </div>
 
     <div class="row g-3 mb-4">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-12">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Cerca</h5>
@@ -45,33 +48,39 @@
                             $groupedByDate = $lezioni->groupBy('data');
                         @endphp
 
+                        @php
+                            $dateColorIndex = 0;
+                            $dateColors = ['bg-primary bg-opacity-10', 'bg-info bg-opacity-10'];
+                        @endphp
+
                         @foreach($lezioni as $index => $lezione)
                             @php
                                 $currentDate = $lezione->data->format('Y-m-d');
                                 $isNewDate = $previousDate !== $currentDate;
+
+                                if ($isNewDate && $index > 0) {
+                                    $dateColorIndex = ($dateColorIndex + 1) % 2;
+                                }
+
                                 $previousDate = $currentDate;
-                                
+
                                 // Calculate total hours for this date
                                 $dateLezioni = $groupedByDate[$currentDate] ?? collect();
                                 $totalHours = $dateLezioni->sum('ore_lezione');
-                                
+
                                 // Determine row class based on hours
-                                $rowClass = '';
+                                $rowClass = $dateColors[$dateColorIndex];
                                 if ($totalHours <= 4) {
-                                    $rowClass = 'table-danger';
+                                    $rowClass .= ' border-start border-danger border-3';
                                 } elseif ($totalHours <= 8) {
-                                    $rowClass = 'table-warning';
+                                    $rowClass .= ' border-start border-warning border-3';
                                 }
-                                
+
                                 // Format date for display
                                 $giornoSettimana = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
                                 $dataFormatted = $giornoSettimana[$lezione->data->dayOfWeek] . ' ' . $lezione->data->format('d/m/y');
                             @endphp
-                            
-                            @if($isNewDate && $index > 0)
-                                <tr><td colspan="7" class="border-top border-secondary"></td></tr>
-                            @endif
-                            
+
                             <tr class="{{ $rowClass }}">
                                 <td>{{ $dataFormatted }}</td>
                                 <td>{{ \Carbon\Carbon::parse($lezione->ora_inizio)->format('H:i') }}</td>
@@ -101,11 +110,6 @@
             let visibleCount = 0;
 
             rows.forEach(row => {
-                // Skip separator rows
-                if (row.querySelector('td[colspan]')) {
-                    return;
-                }
-
                 const text = row.textContent.toLowerCase();
                 if (text.includes(searchTerm)) {
                     row.style.display = '';

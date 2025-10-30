@@ -33,6 +33,89 @@ class CalendarioController extends Controller
     }
 
     /**
+     * Export calendar to ICS format.
+     */
+    public function exportIcs()
+    {
+        $lezioni = Lezione::with(['docente', 'modulo'])
+            ->orderBy('data')
+            ->orderBy('ora_inizio')
+            ->get();
+
+        // Create ICS content
+        $ics = "BEGIN:VCALENDAR\r\n";
+        $ics .= "VERSION:2.0\r\n";
+        $ics .= "PRODID:-//Calendario Studs 2025-2027//IT\r\n";
+        $ics .= "CALSCALE:GREGORIAN\r\n";
+        $ics .= "METHOD:PUBLISH\r\n";
+        $ics .= "X-WR-CALNAME:Calendario Studs 2025-2027\r\n";
+        $ics .= "X-WR-TIMEZONE:Europe/Rome\r\n";
+
+        foreach ($lezioni as $lezione) {
+            $dataInizio = $lezione->data->format('Ymd');
+            $oraInizio = \Carbon\Carbon::parse($lezione->ora_inizio)->format('His');
+            $oraFine = \Carbon\Carbon::parse($lezione->ora_fine)->format('His');
+
+            $dtStart = $dataInizio . 'T' . $oraInizio;
+            $dtEnd = $dataInizio . 'T' . $oraFine;
+
+            $summary = $lezione->modulo?->nome ?? 'Lezione';
+            if ($lezione->modulo?->unita_formativa) {
+                $summary .= ' - ' . $lezione->modulo->unita_formativa;
+            }
+
+            $description = '';
+            if ($lezione->docente?->nome) {
+                $description .= 'Docente: ' . $lezione->docente->nome . '\\n';
+            }
+            if ($lezione->aula) {
+                $description .= 'Aula: ' . $lezione->aula;
+            }
+
+            $location = $lezione->aula ?? '';
+
+            // Generate unique ID
+            $uid = md5($lezione->id . $lezione->data . $lezione->ora_inizio) . '@fsd2527';
+
+            $ics .= "BEGIN:VEVENT\r\n";
+            $ics .= "UID:" . $uid . "\r\n";
+            $ics .= "DTSTAMP:" . gmdate('Ymd\THis\Z') . "\r\n";
+            $ics .= "DTSTART:" . $dtStart . "\r\n";
+            $ics .= "DTEND:" . $dtEnd . "\r\n";
+            $ics .= "SUMMARY:" . $this->escapeIcsString($summary) . "\r\n";
+
+            if (!empty($description)) {
+                $ics .= "DESCRIPTION:" . $this->escapeIcsString($description) . "\r\n";
+            }
+
+            if (!empty($location)) {
+                $ics .= "LOCATION:" . $this->escapeIcsString($location) . "\r\n";
+            }
+
+            $ics .= "END:VEVENT\r\n";
+        }
+
+        $ics .= "END:VCALENDAR\r\n";
+
+        // Return as downloadable file
+        return response($ics)
+            ->header('Content-Type', 'text/calendar; charset=utf-8')
+            ->header('Content-Disposition', 'attachment; filename="calendario-studs-2025-2027.ics"');
+    }
+
+    /**
+     * Escape special characters for ICS format.
+     */
+    private function escapeIcsString($string)
+    {
+        $string = str_replace('\\', '\\\\', $string);
+        $string = str_replace(',', '\\,', $string);
+        $string = str_replace(';', '\\;', $string);
+        $string = str_replace("\n", '\\n', $string);
+        return $string;
+    }
+
+    /**
      * Receive calendar data from JavaScript and update the database.
      */
     public function scrapeAndUpdate(Request $request)
