@@ -8,9 +8,7 @@ use App\Models\Modulo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\BrowserKit\HttpBrowser;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Panther\Client;
 
 class CalendarioController extends Controller
 {
@@ -33,44 +31,48 @@ class CalendarioController extends Controller
     public function scrapeAndUpdate()
     {
         try {
-            // Create a browser client
-            $browser = new HttpBrowser(HttpClient::create([
-                'timeout' => 60,
-                'verify_peer' => false,
-                'verify_host' => false,
-            ]));
+            // Create a Panther client (headless Chrome)
+            $client = Client::createChromeClient(null, [
+                '--headless',
+                '--disable-gpu',
+                '--no-sandbox',
+                '--disable-dev-shm-usage',
+            ]);
 
             // Navigate to the page
-            $crawler = $browser->request('GET', 'https://its-calendar-2025-2027.netlify.app/?year=1');
+            $crawler = $client->request('GET', 'https://its-calendar-2025-2027.netlify.app/?year=1');
 
-            // Wait a bit for JavaScript to load (if needed)
-            sleep(2);
+            // Wait for the page to load
+            $client->waitFor('#dataTable', 10);
 
             // Click the button using the XPath selector
-            $buttonCrawler = $crawler->filterXPath('/html/body/div/section[2]/div/div/button[1]');
-            
-            if ($buttonCrawler->count() === 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Button not found on the page'
-                ], 404);
+            try {
+                $button = $crawler->filterXPath('/html/body/div/section[2]/div/div/button[1]');
+
+                if ($button->count() === 0) {
+                    $client->quit();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Button not found on the page'
+                    ], 404);
+                }
+
+                // Click the button
+                $button->click();
+
+                // Wait for the table to update after clicking
+                sleep(2);
+
+            } catch (\Exception $e) {
+                // If button click fails, continue anyway (maybe data is already loaded)
+                Log::warning('Button click failed: ' . $e->getMessage());
             }
 
-            // Click the button
-            $form = $buttonCrawler->form();
-            $crawler = $browser->submit($form);
-
-            // Wait for content to load
-            sleep(2);
-
-            // Get the current page HTML
-            $html = $browser->getResponse()->getContent();
-            $crawler = new Crawler($html);
-
-            // Find the table with id="dataTable"
+            // Get the table rows
             $table = $crawler->filter('#dataTable tbody tr');
 
             if ($table->count() === 0) {
+                $client->quit();
                 return response()->json([
                     'success' => false,
                     'message' => 'No table data found'
@@ -81,7 +83,7 @@ class CalendarioController extends Controller
             $errors = [];
 
             // Parse each row
-            $table->each(function (Crawler $row, $i) use (&$lezioniData, &$errors) {
+            $table->each(function ($row, $i) use (&$lezioniData, &$errors) {
                 try {
                     $cells = $row->filter('td');
                     
@@ -135,6 +137,9 @@ class CalendarioController extends Controller
                     $errors[] = "Error parsing row $i: " . $e->getMessage();
                 }
             });
+
+            // Close the browser
+            $client->quit();
 
             if (empty($lezioniData)) {
                 return response()->json([
@@ -219,7 +224,16 @@ class CalendarioController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Calendar scraping error: ' . $e->getMessage());
-            
+
+            // Make sure to close the browser in case of error
+            if (isset($client)) {
+                try {
+                    $client->quit();
+                } catch (\Exception $quitException) {
+                    // Ignore quit errors
+                }
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error scraping calendar: ' . $e->getMessage()

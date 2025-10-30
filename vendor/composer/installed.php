@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '46e5035ee32ccae7f26dcea85e13da6b70fceecd',
+        'reference' => '110bb7f50a1b570cef03d51c2969b6ab044b0acc',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -84,6 +84,12 @@
             'install_path' => __DIR__ . '/../egulias/email-validator',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'facebook/webdriver' => array(
+            'dev_requirement' => true,
+            'replaced' => array(
+                0 => '*',
+            ),
         ),
         'fakerphp/faker' => array(
             'pretty_version' => 'v1.24.1',
@@ -394,7 +400,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '46e5035ee32ccae7f26dcea85e13da6b70fceecd',
+            'reference' => '110bb7f50a1b570cef03d51c2969b6ab044b0acc',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -642,6 +648,15 @@
             'provided' => array(
                 0 => '*',
             ),
+        ),
+        'php-webdriver/webdriver' => array(
+            'pretty_version' => '1.15.2',
+            'version' => '1.15.2.0',
+            'reference' => '998e499b786805568deaf8cbf06f4044f05d91bf',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../php-webdriver/webdriver',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'phpoption/phpoption' => array(
             'pretty_version' => '1.9.4',
@@ -1055,6 +1070,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'symfony/dependency-injection' => array(
+            'pretty_version' => 'v7.3.4',
+            'version' => '7.3.4.0',
+            'reference' => '82119812ab0bf3425c1234d413efd1b19bb92ae4',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/dependency-injection',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'symfony/deprecation-contracts' => array(
             'pretty_version' => 'v3.6.0',
             'version' => '3.6.0.0',
@@ -1175,6 +1199,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'symfony/panther' => array(
+            'pretty_version' => 'v2.2.0',
+            'version' => '2.2.0.0',
+            'reference' => 'b7e0f834c9046918972edb3dde2ecc4a20f6155e',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/panther',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'symfony/polyfill-ctype' => array(
             'pretty_version' => 'v1.33.0',
             'version' => '1.33.0.0',
@@ -1292,6 +1325,12 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'symfony/service-implementation' => array(
+            'dev_requirement' => true,
+            'provided' => array(
+                0 => '1.1|2.0|3.0',
+            ),
+        ),
         'symfony/string' => array(
             'pretty_version' => 'v7.3.4',
             'version' => '7.3.4.0',
@@ -1342,6 +1381,15 @@
             'install_path' => __DIR__ . '/../symfony/var-dumper',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'symfony/var-exporter' => array(
+            'pretty_version' => 'v7.3.4',
+            'version' => '7.3.4.0',
+            'reference' => '0f020b544a30a7fe8ba972e53ee48a74c0bc87f4',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/var-exporter',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'symfony/yaml' => array(
             'pretty_version' => 'v7.3.5',
