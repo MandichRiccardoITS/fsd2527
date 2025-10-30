@@ -136,7 +136,7 @@
 @section('script')
     <script>
         // Lezioni data (for calendar view)
-        const lezioniData = @json($lezioni->map(function($lezione) {
+        const lezioniData = {!! json_encode($lezioni->map(function($lezione) {
             return [
                 'data' => $lezione->data->format('Y-m-d'),
                 'ora_inizio' => \Carbon\Carbon::parse($lezione->ora_inizio)->format('H:i'),
@@ -146,7 +146,7 @@
                 'unita_formativa' => $lezione->modulo?->unita_formativa ?? '',
                 'aula' => $lezione->aula ?? '',
             ];
-        }));
+        })) !!};
 
         let currentDate = new Date();
         const today = new Date();
