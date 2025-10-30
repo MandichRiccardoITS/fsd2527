@@ -65,6 +65,26 @@
             </div>
         </main>
 
+        <footer class="bg-custom-light mt-auto pt-2">
+            <div class="container">
+                <div class="row">
+                    <div class="col-6 text-center">
+                        <p>
+                            {{ env('APP_VERSION') }}
+                            Created by 
+                            <small class="text-muted text-uppercase">
+                                <a href="https://github.com/MandichRiccardoITS" target="_blank" rel="author noopener noreferrer">Mandich Riccardo</a>
+                            </small>
+                            <br>
+                            with
+                            <small class="text-muted text-uppercase">
+                                <a href="https://laravel.com/docs/12.x" target="_blank" rel="noopener noreferrer">laravel</a>
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
     @yield('script')
