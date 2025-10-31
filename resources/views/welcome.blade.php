@@ -299,6 +299,15 @@
                 }
             }
 
+            // Empty cells after last day to complete the week
+            const lastDayOfWeek = (startDay + daysInMonth) % 7;
+            if (lastDayOfWeek !== 0) {
+                const emptyCellsAfter = 7 - lastDayOfWeek;
+                for (let i = 0; i < emptyCellsAfter; i++) {
+                    html += '<div class="col"></div>';
+                }
+            }
+
             html += '</div>';
             document.getElementById('calendarGrid').innerHTML = html;
         }
