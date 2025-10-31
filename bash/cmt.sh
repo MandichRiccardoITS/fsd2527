@@ -26,7 +26,7 @@ echo "Versione trovata: '$APP_VERSION'"
 
 # Crea il nome del commit con data, ora e versione
 nomeCommit=$(date "+%Y %m %d %H:%M")
-nomeCommit="aggiornamento $nomeCommit [v$APP_VERSION]"
+nomeCommit="aggiornamento $nomeCommit [$APP_VERSION]"
 echo "Messaggio commit: $nomeCommit"
 git commit -am "$nomeCommit"
 
