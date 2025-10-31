@@ -69,8 +69,13 @@
         </div>
         <div class="card-body p-0">
             <div style="max-height: 70vh; overflow-y: auto;">
-                <pre class="mb-0 p-3" style="background: #1a1a1a; color: #e0e0e0; font-size: 0.85rem; line-height: 1.4;">@if(empty($logs))<span class="text-muted">Nessun log trovato</span>@else@foreach($logs as $log){{ $log }}
-@endforeach@endif</pre>
+                <pre class="mb-0 p-3" style="background: #1a1a1a; color: #e0e0e0; font-size: 0.85rem; line-height: 1.4;">@if(empty($logs))
+<span class="text-muted">Nessun log trovato</span>
+@else
+@foreach($logs as $log)
+{{ $log }}
+@endforeach
+@endif</pre>
             </div>
         </div>
     </div>
