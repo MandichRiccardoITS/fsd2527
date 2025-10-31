@@ -286,7 +286,7 @@
                     lessons.forEach(lesson => {
                         html += `<div class="badge bg-primary bg-opacity-75 text-white small d-block mb-1 text-start"
                                      style="font-size: 0.7rem; white-space: normal;">
-                            ${lesson.ora_inizio} - ${lesson.modulo || 'Lezione'}
+                            ${lesson.ora_inizio}-${lesson.ora_fine} - ${lesson.modulo || 'Lezione'}
                         </div>`;
                     });
                 }
